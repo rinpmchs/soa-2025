@@ -1,0 +1,33 @@
+@startuml UsersServiceER
+entity "Users" as U {
+  * id : uuid
+  * username : varchar
+  * email : varchar
+  * login: varchar
+  * password_hash : varchar
+  * created_at : datetime
+  * updated_at : datetime
+}
+
+entity "UserProfiles" as UP {
+  * id : uuid
+  * user_id : uuid
+  * first_name : varchar
+  * last_name : varchar
+  * bio : text
+  * avatar_url : varchar
+  * date_of_birth : date
+}
+
+entity "UserRoles" as UR {
+  * id : uuid
+  * role_name : varchar
+  * description : text
+  * created_at : datetime
+  * updated_at : datetime
+}
+
+' Relationships
+U ||--|| UP : "has"
+U ||--o{ UR : "belongs to"
+@enduml
