@@ -1,0 +1,98 @@
+specification {
+    element person {
+        style {
+            shape person
+            color indigo
+        }
+    }
+    element softwareSystem {
+        style {
+          shape browser
+          color sky
+        }
+    }
+    element database {
+        style {
+          shape storage
+          color gray
+        }
+    }
+        element container
+    element component
+}
+
+model {
+  ui = person "Пользователь" "Пользователь, работающий через UI (веб/мобильное приложение)"
+
+  socialNetwork = softwareSystem "Социальная сеть" {
+
+    apiGateway = container "API Gateway" {
+      description "Принимает все запросы от UI и перенаправляет их к другим сервисам через REST API"
+      technology "Python / FastAPI"
+    }
+    
+    userService = container "User Service" {
+      description "Регистрация, аутентификация и управление информацией о пользователях и их ролях"
+      technology "Python / Django"
+    }
+    
+    postsService = container "Content Service" {
+      description "Управление созданием, обновлением и удалением постов, лайков и комментариев"
+      technology "Python / Flask"
+    }
+    
+    statsService = container "Statistics Service" {
+      description "Подсчет лайков, просмотров, комментариев и предоставление аналитики"
+      technology "Python / FastAPI"
+    }
+    
+    userDb = database "PostgreSQL for Users" {
+      description "Хранение данных о пользователях"
+      technology "PostgreSQL"
+    }
+    
+    postsDb = database "PostgreSQL for Posts" {
+      description "Хранение постов и комментариев"
+      technology "PostgreSQL"
+    }
+    
+    statsDb = database "ClickHouse" {
+      description "Хранение аналитических данных по лайкам, просмотрам и комментариям"
+      technology "ClickHouse"
+    }
+    
+    msgBroker = container "Message Broker" {
+      description "Передает события (лайки, просмотры, комментарии) между сервисами"
+      technology "Kafka"
+      style { 
+        shape queue 
+        color amber
+      }
+    }
+  }
+  
+  ui -> socialNetwork.apiGateway "Использует HTTPS / REST API"
+  
+  socialNetwork.apiGateway -> socialNetwork.userService "Регистрация, аутентификация, управление профилем (JSON/HTTPS)"
+  socialNetwork.apiGateway -> socialNetwork.postsService "CRUD для постов, комментариев, лайков (JSON/HTTPS)"
+  socialNetwork.apiGateway -> socialNetwork.statsService "Запрос аналитики (JSON/HTTPS)"
+  
+  socialNetwork.userService -> socialNetwork.userDb "Читает/записывает данные (SQL)"
+  socialNetwork.postsService -> socialNetwork.postsDb "Читает/записывает данные (SQL)"
+  socialNetwork.statsService -> socialNetwork.statsDb "Читает/записывает данные (SQL)"
+  
+  socialNetwork.postsService -> socialNetwork.msgBroker "Публикует события о лайках, просмотрах, комментариях"
+  socialNetwork.apiGateway -> socialNetwork.msgBroker "Публикует события"
+  socialNetwork.msgBroker -> socialNetwork.statsService "Передает события для агрегации статистики"
+}
+
+views {
+  view context {
+    include ui
+    include socialNetwork
+  }
+  
+  view containers {
+    include socialNetwork.*
+  }
+}

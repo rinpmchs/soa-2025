@@ -1,0 +1,33 @@
+@startuml ContentServiceER
+entity "Posts" as P {
+  * id : uuid
+  * user_id : uuid
+  * content : text
+  * created_at : datetime
+  * updated_at : datetime
+  * is_deleted : boolean
+}
+
+entity "Comments" as C {
+  * id : uuid
+  * post_id : uuid
+  * user_id : uuid
+  * content : text
+  * created_at : datetime
+  * updated_at : datetime
+  * parent_comment_id : int nullable
+}
+
+entity "Likes" as L {
+  * id : uuid
+  * post_id : uuid
+  * user_id : uuid
+  * reaction_type : varchar
+  * created_at : datetime
+}
+
+' Define relationships
+P ||--o{ C : "has"
+P ||--o{ L : "receives"
+C ||--o{ C : "has"  ' For nested comments
+@enduml

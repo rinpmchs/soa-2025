@@ -1,0 +1,32 @@
+@startuml APIGatewayER
+
+entity "APILogs" as AL {
+  * id : uuid
+  * request_timestamp : datetime
+  * response_time : int
+  * endpoint : varchar
+  * status_code : int
+  * user_ip : varchar
+}
+
+entity "APIConfigurations" as AC {
+  * id : uuid
+  * config_key : varchar
+  * config_value : varchar
+  * description : text
+  * created_at : datetime
+  * updated_at : datetime
+}
+
+entity "APIUsage" as AU {
+  * id : uuid
+  * user_id : uuid
+  * log_id : uuid  (FK)
+  * endpoint : varchar
+  * usage_count : int
+  * last_accessed_at : datetime
+}
+
+AL ||--o{ AU : "records"
+
+@enduml
