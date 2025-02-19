@@ -36,8 +36,8 @@ model {
       technology "Python / Django"
     }
     
-    postsService = container "Posts & Comments Service" {
-      description "Управление созданием, обновлением и удалением постов и комментариев"
+    postsService = container "Content Service" {
+      description "Управление созданием, обновлением и удалением постов, лайков и комментариев"
       technology "Python / Flask"
     }
     
@@ -47,7 +47,7 @@ model {
     }
     
     userDb = database "PostgreSQL for Users" {
-      description "Хранение данных пользователей и их ролей"
+      description "Хранение данных о пользователях"
       technology "PostgreSQL"
     }
     
