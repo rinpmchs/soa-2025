@@ -1,0 +1,30 @@
+@startuml StatisticsServiceER
+
+entity "PostStatistics" as PS {
+  * id : uuid
+  * post_id : uuid
+  * likes_count : int
+  * views_count : int
+  * comments_count : int
+  * updated_at : datetime
+}
+
+entity "UserStatistics" as US {
+  * id : uuid
+  * user_id : uuid
+  * posts_count : int
+  * likes_given : int
+  * comments_count : int
+  * views_count : int
+  * updated_at : datetime
+}
+
+entity "CommentStatistics" as CS {
+  * id : uuid
+  * comment_id : uuid
+  * likes_count : int
+  * replies_count : int
+  * updated_at : datetime
+}
+
+@enduml
