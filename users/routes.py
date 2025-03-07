@@ -32,19 +32,6 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-# @router.post("/login", response_model=TokenResponse)
-# def login(user_data: LoginRequest, db: Session = Depends(get_db)):
-#     """Authenticates user and returns JWT token."""
-#     user = db.query(User).filter(User.login == user_data.login).first()
-#
-#     if not user or not verify_password(user_data.password, user.password_hash):
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-#
-#     # Generate JWT token
-#     access_token = create_access_token({"sub": user.login})
-#     return {"access_token": access_token, "token_type": "bearer"}
-
-
 @router.post("/login", response_model=TokenResponse)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     """OAuth2 Login: Authenticate user and return JWT"""

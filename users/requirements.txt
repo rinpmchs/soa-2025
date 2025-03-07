@@ -9,3 +9,4 @@ passlib
 python-dotenv
 pydantic[email]
 python-multipart
+pytest
