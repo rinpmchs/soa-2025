@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:14
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  users_service:
+    build:
+      context: ./users
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/users_db
+      SECRET_KEY: "mysecretkey"
+    ports:
+      - "8000:8000"
+
+  api_gateway:
+    build:
+      context: ./api_gateway
+    restart: unless-stopped
+    depends_on:
+      - users_service
+    environment:
+      USER_SERVICE_URL: http://users_service:8000/users
+      SECRET_KEY: "mysecretkey"
+    ports:
+      - "8001:8001"
+
+volumes:
+  db_data:
