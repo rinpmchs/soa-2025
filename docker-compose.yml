@@ -1,0 +1,63 @@
+services:
+  db:
+    image: postgres:14
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  posts_db:
+    image: postgres:14
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: posts_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - posts_db_data:/var/lib/postgresql/data
+
+  users_service:
+    build:
+      context: ./users
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/users_db
+    ports:
+      - "8000:8000"
+
+  posts_service:
+    build:
+      context: ./posts
+    restart: unless-stopped
+    depends_on:
+      - posts_db
+    environment:
+      DATABASE_URL: postgresql://user:password@posts_db:5432/posts_db
+    ports:
+      - "50052:50052"
+
+  api_gateway:
+    build:
+      context: ./api_gateway
+    restart: unless-stopped
+    depends_on:
+      - users_service
+      - posts_service
+    environment:
+      USER_SERVICE_URL: http://users_service:8000/users
+      POST_SERVICE_URL: http://posts_service:50052/posts
+    ports:
+      - "8001:8001"
+
+volumes:
+  db_data:
+  posts_db_data:

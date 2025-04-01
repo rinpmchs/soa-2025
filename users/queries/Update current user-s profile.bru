@@ -1,0 +1,21 @@
+meta {
+  name: Update current user-s profile
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/update
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "email": "assistant@edu.hse"
+  }
+}

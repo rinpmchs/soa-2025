@@ -1,0 +1,18 @@
+meta {
+  name: Login using JSON body
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/login_json
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "login": "teach",
+    "password": "TAstr0ngPASS"
+  }
+}
