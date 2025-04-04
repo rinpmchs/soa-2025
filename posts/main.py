@@ -1,7 +1,7 @@
 import grpc
 from concurrent import futures
 from proto import posts_pb2_grpc
-from service import PostService
+from post_service import PostService
 from models import Base
 from database import engine
 

@@ -1,5 +1,24 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
+from datetime import datetime
+
+
+class PostCreate(BaseModel):
+    title: str
+    description: str
+    is_private: bool = False
+    tags: List[str] = []
+
+
+class PostUpdate(PostCreate):
+    pass  # можно будет расширить позже
+
+
+class PostResponse(PostCreate):
+    id: str
+    creator_id: str
+    created_at: datetime
+    updated_at: datetime
 
 
 class UserCreate(BaseModel):

@@ -5,7 +5,7 @@ info:
   description: API for user registration, login, profile retrieval and update.
 
 paths:
-  /register:
+  /v1/register:
     post:
       summary: Register a new user
       requestBody:
@@ -24,7 +24,7 @@ paths:
         '400':
           description: Login or email already exists
 
-  /login_json:
+  /v1/login_json:
     post:
       summary: Login using JSON body
       requestBody:
@@ -43,7 +43,7 @@ paths:
         '401':
           description: Invalid credentials
 
-  /login:
+  /v1/login:
     post:
       summary: Login using OAuth2 form
       requestBody:
@@ -67,7 +67,7 @@ paths:
         '401':
           description: Invalid credentials
 
-  /me:
+  /v1/me:
     get:
       summary: Get current user profile
       security:
@@ -80,7 +80,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
 
-  /update:
+  /v1/update:
     put:
       summary: Update current user's profile
       security:
