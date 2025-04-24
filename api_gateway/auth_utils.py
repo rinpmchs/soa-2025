@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 import httpx
 from config import settings
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/users/token")
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:

@@ -162,6 +162,7 @@ def run():
     post_id_sasha = create_post_sasha(stub)
     post_id_dasha = create_post_dasha(stub)
     get_post(stub, post_id)
+    # add trying to get private post
     update_post_not_creator(stub, post_id_dasha)
     update_post(stub, post_id_sasha)
     list_posts(stub)
