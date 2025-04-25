@@ -9,3 +9,4 @@ protobuf
 grpcio
 grpcio-tools
 pydantic-settings
+confluent-kafka==1.8.2

@@ -3,6 +3,15 @@ from typing import Optional, List
 from datetime import datetime
 
 
+class LikeRequest(BaseModel):
+    post_id: int
+
+
+class CommentRequest(BaseModel):
+    post_id: int
+    text: str
+
+
 class PostCreate(BaseModel):
     title: str
     description: str

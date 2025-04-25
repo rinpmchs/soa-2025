@@ -1,9 +1,10 @@
 import grpc
 from concurrent import futures
-from proto import posts_pb2_grpc
+from proto import posts_pb2, posts_pb2_grpc
 from post_service import PostService
 from models import Base
 from database import engine
+from proto import posts_pb2_grpc
 
 Base.metadata.create_all(bind=engine)
 

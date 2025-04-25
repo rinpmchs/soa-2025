@@ -1,6 +1,11 @@
 import os
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
+from confluent_kafka import Producer
+
+kafka_producer = Producer({
+    'bootstrap.servers': 'kafka:9092'
+})
 
 load_dotenv()
 

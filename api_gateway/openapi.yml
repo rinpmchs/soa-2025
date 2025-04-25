@@ -121,6 +121,40 @@ paths:
     /v1/posts/{post_id}:
       get:
         summary: Get post by ID
+    /v1/posts/{post_id}/like:
+      post:
+        summary: Like a post
+        parameters:
+          - name: post_id
+            in: path
+            required: true
+            schema:
+              type: integer
+        responses:
+          "200":
+            description: Post liked successfully
+
+    /v1/posts/{post_id}/comment:
+      post:
+        summary: Add comment to a post
+        parameters:
+          - name: post_id
+            in: path
+            required: true
+            schema:
+              type: integer
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+        responses:
+          "200":
+            description: Comment added successfully
 
 components:
   securitySchemes:
