@@ -3,13 +3,47 @@ from proto import posts_pb2, posts_pb2_grpc
 from google.protobuf.timestamp_pb2 import Timestamp
 import grpc
 from typing import List
-from schemas import PostCreate, PostUpdate, PostResponse
+from schemas import PostCreate, PostUpdate, PostResponse, LikeRequest, CommentRequest
 from auth_utils import get_current_user
+from fastapi import APIRouter, Depends, Body
+from config import kafka_producer
+import json
 
 router = APIRouter()
 
 channel = grpc.insecure_channel("posts_service:50052")
 stub = posts_pb2_grpc.PostServiceStub(channel)
+
+@router.post("/{post_id}/like")
+async def like_post(post_id: int):
+    event = {
+        "event_type": "like",
+        "post_id": post_id
+    }
+    kafka_producer.produce(
+        topic="post_events",
+        key=str(post_id),
+        value=json.dumps(event).encode('utf-8')
+    )
+    kafka_producer.flush()
+    return {"message": "Post liked successfully"}
+
+
+@router.post("/{post_id}/comment")
+async def comment_post(post_id: int, body: dict = Body(...)):
+    text = body["text"]
+    event = {
+        "event_type": "comment",
+        "post_id": post_id,
+        "text": text
+    }
+    kafka_producer.produce(
+        topic="post_events",
+        key=str(post_id),
+        value=json.dumps(event).encode('utf-8')
+    )
+    kafka_producer.flush()
+    return {"message": "Comment added successfully"}
 
 
 @router.post("/create", response_model=PostResponse)
@@ -127,3 +161,41 @@ async def list_posts(
     except grpc.RpcError as e:
         raise HTTPException(status_code=500, detail=f"gRPC error: {e.details()}")
 
+from fastapi import APIRouter, Depends, Body
+from api.config import kafka_producer
+from api.schemas import LikeRequest, CommentRequest  # Если понадобится схема
+import json
+
+router = APIRouter()
+
+@router.post("/posts/{post_id}/like")
+async def like_post(post_id: int):
+    # Отправка события в Kafka
+    event = {
+        "event_type": "like",
+        "post_id": post_id
+    }
+    kafka_producer.produce(
+        topic="post_events",
+        key=str(post_id),
+        value=json.dumps(event).encode('utf-8')
+    )
+    kafka_producer.flush()
+    return {"message": "Post liked successfully"}
+
+
+@router.post("/posts/{post_id}/comment")
+async def comment_post(post_id: int, body: dict = Body(...)):
+    text = body["text"]
+    event = {
+        "event_type": "comment",
+        "post_id": post_id,
+        "text": text
+    }
+    kafka_producer.produce(
+        topic="post_events",
+        key=str(post_id),
+        value=json.dumps(event).encode('utf-8')
+    )
+    kafka_producer.flush()
+    return {"message": "Comment added successfully"}

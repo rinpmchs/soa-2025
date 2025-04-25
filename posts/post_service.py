@@ -1,10 +1,20 @@
 from proto import posts_pb2, posts_pb2_grpc
 from database import SessionLocal
-from models import Post
+from models import Post, Like, Comment
 from google.protobuf.timestamp_pb2 import Timestamp
 from sqlalchemy.exc import NoResultFound
 from uuid import UUID
 import grpc
+from confluent_kafka import Producer
+import json
+import os
+
+producer = Producer({'bootstrap.servers': os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")})
+
+
+def send_to_kafka(topic: str, event: dict):
+    producer.produce(topic, json.dumps(event).encode("utf-8"))
+    producer.flush()
 
 
 class PostService(posts_pb2_grpc.PostServiceServicer):
@@ -178,4 +188,113 @@ class PostService(posts_pb2_grpc.PostServiceServicer):
         finally:
             session.close()
 
-    # c
+    def LikePost(self, request, context):
+        db = SessionLocal()
+        try:
+            like = Like(
+                post_id=request.post_id,
+                client_id=request.client_id
+            )
+            db.add(like)
+            db.commit()
+
+            ts = Timestamp()
+            ts.GetCurrentTime()
+            event = {
+                "post_id": request.post_id,
+                "client_id": request.client_id,
+                "timestamp": ts.ToJsonString()
+            }
+            send_to_kafka("post_liked", event)
+
+            return posts_pb2.LikePostResponse()
+
+        except Exception as e:
+            db.rollback()
+            context.set_details(f"Error liking post: {e}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            return posts_pb2.LikePostResponse()
+
+        finally:
+            db.close()
+
+    def CommentPost(self, request, context):
+        db = SessionLocal()
+        try:
+            comment = Comment(
+                post_id=request.post_id,
+                client_id=request.client_id,
+                text=request.text
+            )
+            db.add(comment)
+            db.commit()
+
+            ts = Timestamp()
+            ts.GetCurrentTime()
+            event = {
+                "post_id": request.post_id,
+                "client_id": request.client_id,
+                "text": request.text,
+                "timestamp": ts.ToJsonString()
+            }
+            send_to_kafka("post_commented", event)
+
+            return posts_pb2.CommentPostResponse()
+
+        except Exception as e:
+            db.rollback()
+            context.set_details(f"Error commenting post: {e}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            return posts_pb2.CommentPostResponse()
+
+        finally:
+            db.close()
+
+    def GetPostComments(self, request, context):
+        db = SessionLocal()
+        try:
+            page = max(1, request.page)
+            limit = min(request.limit or 10, 100)
+            offset = (page - 1) * limit
+
+            comments_query = db.query(Comment).filter_by(post_id=request.post_id) \
+                .order_by(Comment.created_at.desc()) \
+                .offset(offset).limit(limit).all()
+
+            response = posts_pb2.GetPostCommentsResponse()
+
+            for c in comments_query:
+                response.comments.add(
+                    client_id=c.client_id,
+                    text=c.text,
+                    created_at=c.created_at.isoformat()
+                )
+
+            return response
+
+        except Exception as e:
+            context.set_details(f"Error getting comments: {e}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            return posts_pb2.GetPostCommentsResponse()
+
+        finally:
+            db.close()
+
+    def ViewPost(self, request, context):
+        try:
+            ts = Timestamp()
+            ts.GetCurrentTime()
+
+            event = {
+                "post_id": request.post_id,
+                "client_id": request.client_id,
+                "timestamp": ts.ToJsonString()
+            }
+            send_to_kafka("post_viewed", event)
+
+            return posts_pb2.ViewPostResponse()
+
+        except Exception as e:
+            context.set_details(f"Error viewing post: {e}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            return posts_pb2.ViewPostResponse()
