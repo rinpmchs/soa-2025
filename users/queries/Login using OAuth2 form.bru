@@ -1,0 +1,16 @@
+meta {
+  name: Login using OAuth2 form
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/login
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  username: "teach"
+  password: "TAstr0ngPASS"
+}

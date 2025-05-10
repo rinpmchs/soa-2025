@@ -1,0 +1,25 @@
+meta {
+  name: Update current user profile
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/users/update
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+  "first_name": "Teaching",
+  "last_name": "Assistant",
+  "date_of_birth": "12.04.2001",
+  "phone_number": "8696967",
+  "email": "tatest-new@edu.ru"
+  }
+}
