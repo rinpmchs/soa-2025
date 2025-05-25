@@ -1,0 +1,5 @@
+grpcio
+grpcio-tools
+clickhouse-driver
+confluent-kafka
+protobuf
