@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+httpx
+python-jose[cryptography]
+python-dotenv
+python-multipart
+pydantic[email]
+protobuf
+grpcio
+grpcio-tools
+pydantic-settings
+confluent-kafka==1.8.2
