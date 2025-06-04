@@ -1,0 +1,7 @@
+grpcio
+grpcio-tools
+sqlalchemy
+psycopg2-binary
+python-dotenv
+protobuf
+confluent-kafka==1.8.2
